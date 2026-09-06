@@ -1,0 +1,134 @@
+{
+    "runs": [
+        {
+            "run_id": 1,
+            "QPSO": {
+                "fitness": 273.723,
+                "distance": 491.0,
+                "congestion": 128.871
+            },
+            "OR_Tools": {
+                "fitness": 425.784,
+                "distance": 705.24,
+                "congestion": 214.46
+            }
+        },
+        {
+            "run_id": 2,
+            "QPSO": {
+                "fitness": 291.174,
+                "distance": 534.0,
+                "congestion": 129.289
+            },
+            "OR_Tools": {
+                "fitness": 425.784,
+                "distance": 705.24,
+                "congestion": 214.46
+            }
+        },
+        {
+            "run_id": 3,
+            "QPSO": {
+                "fitness": 276.281,
+                "distance": 519.0,
+                "congestion": 114.468
+            },
+            "OR_Tools": {
+                "fitness": 425.784,
+                "distance": 705.24,
+                "congestion": 214.46
+            }
+        },
+        {
+            "run_id": 4,
+            "QPSO": {
+                "fitness": 288.586,
+                "distance": 535.0,
+                "congestion": 124.31
+            },
+            "OR_Tools": {
+                "fitness": 425.784,
+                "distance": 705.24,
+                "congestion": 214.46
+            }
+        },
+        {
+            "run_id": 5,
+            "QPSO": {
+                "fitness": 282.899,
+                "distance": 528.0,
+                "congestion": 119.499
+            },
+            "OR_Tools": {
+                "fitness": 425.784,
+                "distance": 705.24,
+                "congestion": 214.46
+            }
+        },
+        {
+            "run_id": 6,
+            "QPSO": {
+                "fitness": 263.182,
+                "distance": 490.0,
+                "congestion": 111.971
+            },
+            "OR_Tools": {
+                "fitness": 425.784,
+                "distance": 705.24,
+                "congestion": 214.46
+            }
+        },
+        {
+            "run_id": 7,
+            "QPSO": {
+                "fitness": 284.457,
+                "distance": 528.0,
+                "congestion": 122.094
+            },
+            "OR_Tools": {
+                "fitness": 425.784,
+                "distance": 705.24,
+                "congestion": 214.46
+            }
+        },
+        {
+            "run_id": 8,
+            "QPSO": {
+                "fitness": 284.797,
+                "distance": 538.0,
+                "congestion": 115.996
+            },
+            "OR_Tools": {
+                "fitness": 425.784,
+                "distance": 705.24,
+                "congestion": 214.46
+            }
+        },
+        {
+            "run_id": 9,
+            "QPSO": {
+                "fitness": 278.408,
+                "distance": 516.0,
+                "congestion": 120.013
+            },
+            "OR_Tools": {
+                "fitness": 425.784,
+                "distance": 705.24,
+                "congestion": 214.46
+            }
+        },
+        {
+            "run_id": 10,
+            "QPSO": {
+                "fitness": 253.662,
+                "distance": 447.0,
+                "congestion": 124.77
+            },
+            "OR_Tools": {
+                "fitness": 425.784,
+                "distance": 705.24,
+                "congestion": 214.46
+            }
+        }
+    ]
+}
