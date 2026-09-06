@@ -1,0 +1,8 @@
+{
+  "name": "Remix QPSO-VRP - Traffic Route Optimization",
+  "description": "Quantum-Inspired Intelligent Traffic-Aware Route Optimization platform for Smart India Hackathon (SIH 2026)",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
