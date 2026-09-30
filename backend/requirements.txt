@@ -4,3 +4,6 @@ numpy
 ortools
 networkx
 pydantic
+osmnx
+geopy
+shapely

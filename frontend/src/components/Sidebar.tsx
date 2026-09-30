@@ -51,7 +51,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <Atom className="w-4 h-4 animate-[spin_12s_linear_infinite]" />
             </div>
             <span className="text-[#00FF9D] font-bold text-lg leading-tight tracking-tighter">
-              QPSO-VRP
+              QRoute
             </span>
           </div>
           <div className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">

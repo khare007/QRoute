@@ -1,16 +1,16 @@
 import numpy as np
 
 class VRPConstraints:
-    def __init__(self, num_nodes=21):
+    def __init__(self, graph_net, vehicle_capacity: int = 100):
         self.depot = 0
-        self.customers = list(range(1, num_nodes))
+        self.num_nodes = graph_net.num_nodes
+        self.customers = list(range(1, self.num_nodes))
+        self.vehicle_capacity = vehicle_capacity
         
-        # Fixed demands for reproducible presentation
-        np.random.seed(42)
-        self.demands = [0] + [np.random.randint(10, 30) for _ in range(num_nodes-1)]
+        # Real demands directly loaded from node metadata
+        self.demands = [graph_net.nodes_metadata[i]["demand"] for i in range(self.num_nodes)]
         
-        self.vehicle_capacity = 100
-        self.num_vehicles = 3
-
-# Global instance to be imported by other files
-vrp_env = VRPConstraints()
+        # Dynamic fleet allocation based on total demand load
+        total_demand = sum(self.demands)
+        min_vehicles_needed = int(np.ceil(total_demand / (self.vehicle_capacity * 0.8)))
+        self.num_vehicles = max(3, min_vehicles_needed)

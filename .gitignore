@@ -1,8 +1,35 @@
+# Node / Frontend dependencies & build
 node_modules/
-build/
+frontend/node_modules/
 dist/
-coverage/
-.DS_Store
+frontend/dist/
+.vite/
+frontend/.vite/
+
+# Python cache & virtual environments
+__pycache__/
+backend/__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+backend/.venv/
+env/
+venv/
+ENV/
+
+# Environment Variables & Local Secrets
+.env
+.env.local
+*.local
+
+# Logs
 *.log
-.env*
-!.env.example
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / Editor temporary files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

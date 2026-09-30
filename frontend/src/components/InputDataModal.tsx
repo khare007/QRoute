@@ -25,6 +25,7 @@ interface InputDataModalProps {
   onDeleteCustomer: (id: number) => void;
   onUpdateCustomerDemand: (id: number, demand: number) => void;
   onBatchUpdateDemands: (mode: 'uniform' | 'random' | 'reset', val?: number) => void;
+  onSetCustomerCount?: (count: number) => void;
 }
 
 export const InputDataModal: React.FC<InputDataModalProps> = ({
@@ -36,7 +37,8 @@ export const InputDataModal: React.FC<InputDataModalProps> = ({
   onAddCustomer,
   onDeleteCustomer,
   onUpdateCustomerDemand,
-  onBatchUpdateDemands
+  onBatchUpdateDemands,
+  onSetCustomerCount
 }) => {
   const [showCustomAdd, setShowCustomAdd] = useState<boolean>(false);
   const [newDemand, setNewDemand] = useState<number>(15);
@@ -53,6 +55,23 @@ export const InputDataModal: React.FC<InputDataModalProps> = ({
 
   const nextNodeId = Math.max(...nodes.map((n) => n.id), 0) + 1;
 
+  const handleCustomerCountChange = (targetCount: number) => {
+    const clamped = Math.max(1, Math.min(100, targetCount));
+    if (onSetCustomerCount) {
+      onSetCustomerCount(clamped);
+    } else {
+      const current = customerNodes.length;
+      if (clamped > current) {
+        for (let i = 0; i < clamped - current; i++) {
+          onAddCustomer();
+        }
+      } else if (clamped < current) {
+        const toDelete = customerNodes.slice(clamped).map((n) => n.id);
+        toDelete.forEach((id) => onDeleteCustomer(id));
+      }
+    }
+  };
+
   const handleQuickMinusCustomer = () => {
     if (customerNodes.length <= 1) return;
     const lastCustomer = customerNodes[customerNodes.length - 1];
@@ -61,6 +80,7 @@ export const InputDataModal: React.FC<InputDataModalProps> = ({
 
   const handleCustomAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (customerNodes.length >= 100) return;
     onAddCustomer(newDemand, newX, newY);
     // Reset custom inputs with slightly randomized next position
     setNewX((prev) => Math.min(500, Math.max(80, prev + Math.floor(Math.random() * 60 - 30))));
@@ -100,18 +120,57 @@ export const InputDataModal: React.FC<InputDataModalProps> = ({
         {/* Modal Content */}
         <div className="p-5 sm:p-6 overflow-y-auto space-y-6 text-xs text-slate-300">
           {/* Scenario Parameters Form */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            {/* Dataset / Environment with Real Delhi Map (OSM) */}
             <div className="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800">
               <label className="text-[11px] font-semibold text-slate-400 block mb-1">
                 Dataset / Environment
               </label>
-              <input
-                type="text"
+              <select
                 value={scenarioInfo.dataset}
-                readOnly
-                className="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 font-mono text-white"
-              />
+                onChange={(e) => onUpdateScenario({ dataset: e.target.value })}
+                className="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 font-mono text-white text-xs focus:border-[#00A3FF] focus:outline-none cursor-pointer"
+              >
+                <option value="Synthetic Graph">Synthetic Graph</option>
+                <option value="Real Delhi Map (OSM)">Real Delhi Map (OSM)</option>
+              </select>
             </div>
+
+            {/* Customers Number Input & Slider - Strictly Max 100 */}
+            <div className="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800 flex flex-col justify-between overflow-hidden">
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-[11px] font-semibold text-slate-400">
+                  Customers (Max 100)
+                </label>
+                <span className="text-[10px] text-[#00FF9D] font-mono font-bold">
+                  {customerNodes.length} / 100
+                </span>
+              </div>
+              <div className="flex items-center gap-2.5 w-full">
+                <input
+                  type="number"
+                  value={customerNodes.length}
+                  min={1}
+                  max={100}
+                  onChange={(e) => {
+                    const val = Math.max(1, Math.min(100, Number(e.target.value) || 1));
+                    handleCustomerCountChange(val);
+                  }}
+                  className="w-12 flex-shrink-0 bg-slate-900 border border-slate-700 rounded px-1.5 py-1 font-mono text-white text-xs focus:border-[#00A3FF] focus:outline-none text-center"
+                />
+                <div className="flex-1 min-w-0 flex items-center px-1">
+                  <input
+                    type="range"
+                    min={1}
+                    max={100}
+                    value={customerNodes.length}
+                    onChange={(e) => handleCustomerCountChange(Math.max(1, Math.min(100, Number(e.target.value))))}
+                    className="w-full accent-[#00FF9D] cursor-pointer h-1.5 bg-slate-700 rounded-lg outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800">
               <div className="flex items-center justify-between mb-1">
                 <label className="text-[11px] font-semibold text-slate-400">
@@ -128,6 +187,7 @@ export const InputDataModal: React.FC<InputDataModalProps> = ({
                 className="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 font-mono text-white focus:border-[#00A3FF] focus:outline-none"
               />
             </div>
+
             <div className="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800">
               <div className="flex items-center justify-between mb-1">
                 <label className="text-[11px] font-semibold text-slate-400">
@@ -242,8 +302,9 @@ export const InputDataModal: React.FC<InputDataModalProps> = ({
                   id="btn-quick-add-customer"
                   type="button"
                   onClick={() => onAddCustomer()}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00FF9D]/15 hover:bg-[#00FF9D]/25 border border-[#00FF9D]/40 text-xs font-semibold text-[#00FF9D] font-mono transition cursor-pointer"
-                  title="Quick Add Customer (+)"
+                  disabled={customerNodes.length >= 100}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00FF9D]/15 hover:bg-[#00FF9D]/25 border border-[#00FF9D]/40 text-xs font-semibold text-[#00FF9D] font-mono transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  title={customerNodes.length >= 100 ? 'Strict limit: Max 100 customers' : 'Quick Add Customer (+)'}
                 >
                   <span className="font-bold text-sm leading-none">+</span>
                   <span>Quick Add</span>

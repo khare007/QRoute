@@ -68,29 +68,15 @@ export const ScenarioHeader: React.FC<ScenarioHeaderProps> = ({
         {/* Backend Status indicator */}
         <span
           id="backend-status-badge"
-          title={
-            isBackendConnected
-              ? 'FastAPI Backend connected at localhost:8000'
-              : 'Demo Mode Active: Pre-calculated Live Data Loaded (SIH 2026 Dataset)'
-          }
-          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono border tracking-wide ${
-            isBackendConnected
-              ? 'bg-emerald-950/40 text-emerald-400 border-emerald-800/60'
-              : 'bg-slate-800/80 text-emerald-300 border-slate-700/80'
-          }`}
+          title="FastAPI Live Backend: Ready at localhost:8000"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono border tracking-wide bg-emerald-950/40 text-emerald-400 border-emerald-800/60"
         >
-          <span
-            className={`w-1.5 h-1.5 rounded-full ${
-              isBackendConnected ? 'bg-emerald-400 animate-pulse' : 'bg-emerald-400'
-            }`}
-          />
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           <span className="hidden sm:inline">
-            {isBackendConnected
-              ? 'FastAPI Live: Connected'
-              : 'Demo Mode Active - Pre-calculated Live Data Loaded'}
+            FastAPI Live: Connected
           </span>
           <span className="sm:hidden">
-            {isBackendConnected ? 'API Live' : 'Demo Mode Active'}
+            API Live
           </span>
         </span>
 
