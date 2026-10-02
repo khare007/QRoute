@@ -9,7 +9,7 @@
 
 ---
 
-## 📌 What is QRoute? (In Plain English)
+## 📌 What is QRoute?
 
 Imagine managing a fleet of delivery vehicles in a congested mega-city like **Delhi NCR**. 
 Every minute lost in a traffic jam costs fuel, money, and customer trust.
