@@ -34,6 +34,8 @@ export const RouteMap: React.FC<RouteMapProps> = ({
 }) => {
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [panOffset, setPanOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null);
   const [hoveredRoute, setHoveredRoute] = useState<number | null>(null);
 
@@ -42,11 +44,38 @@ export const RouteMap: React.FC<RouteMapProps> = ({
     dataset === 'Real Delhi Map (OSM)' ? 'osm' : 'dual'
   );
 
-  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.2, 2.2));
-  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.2, 0.6));
+  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.25, 3.0));
+  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.25, 0.5));
+  const handlePan = (dx: number, dy: number) => {
+    setPanOffset((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
+  };
   const handleResetZoom = () => {
     setZoomLevel(1);
     setPanOffset({ x: 0, y: 0 });
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (!isDragging) return;
+    setPanOffset({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y
+    });
+  };
+
+  const handleMouseUp = () => setIsDragging(false);
+
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.deltaY < 0) {
+      setZoomLevel((prev) => Math.min(prev + 0.15, 3.0));
+    } else {
+      setZoomLevel((prev) => Math.max(prev - 0.15, 0.5));
+    }
   };
 
   // Helper to get node position by ID
@@ -84,53 +113,99 @@ export const RouteMap: React.FC<RouteMapProps> = ({
     return path;
   };
 
+  const isHighDensity = nodes.length > 40;
+
   const renderSyntheticCanvas = () => (
-    <div className="relative flex-1 w-full h-full min-h-[380px] bg-[radial-gradient(#1e293b_1px,transparent_1px)] bg-[size:20px_20px] bg-[#0B0F19] overflow-hidden select-none">
+    <div
+      onWheel={handleWheel}
+      className="relative flex-1 w-full h-full min-h-[380px] bg-[radial-gradient(#1e293b_1px,transparent_1px)] bg-[size:20px_20px] bg-[#0B0F19] overflow-hidden select-none"
+    >
       {/* Floating Controls (Top-Right) */}
       <div
         id="map-controls"
-        className="absolute top-3 right-3 z-10 flex flex-col gap-1.5 bg-black/60 backdrop-blur border border-slate-700 rounded-lg p-1 text-slate-300 shadow-md"
+        className="absolute top-3 right-3 z-10 flex flex-col gap-1.5 bg-black/70 backdrop-blur border border-slate-700 rounded-lg p-1.5 text-slate-300 shadow-lg"
       >
-        <button
-          onClick={handleResetZoom}
-          title="Center Graph"
-          className="p-1.5 hover:bg-slate-800 rounded transition text-slate-400 hover:text-white cursor-pointer"
-        >
-          <Crosshair className="w-3.5 h-3.5" />
-        </button>
-        <button
-          onClick={handleZoomIn}
-          title="Zoom In"
-          className="p-1.5 hover:bg-slate-800 rounded transition text-slate-400 hover:text-white cursor-pointer"
-        >
-          <Plus className="w-3.5 h-3.5" />
-        </button>
-        <button
-          onClick={handleZoomOut}
-          title="Zoom Out"
-          className="p-1.5 hover:bg-slate-800 rounded transition text-slate-400 hover:text-white cursor-pointer"
-        >
-          <Minus className="w-3.5 h-3.5" />
-        </button>
-        <button
-          onClick={handleResetZoom}
-          title="Reset View"
-          className="p-1.5 hover:bg-slate-800 rounded transition text-slate-400 hover:text-white cursor-pointer"
-        >
-          <Maximize2 className="w-3.5 h-3.5" />
-        </button>
+        <div className="grid grid-cols-3 gap-1 place-items-center">
+          <div />
+          <button
+            onClick={() => handlePan(0, 30)}
+            title="Pan Up"
+            className="p-1 hover:bg-slate-800 rounded transition text-slate-400 hover:text-white cursor-pointer text-xs flex items-center justify-center w-6 h-6"
+          >
+            ▲
+          </button>
+          <div />
+          <button
+            onClick={() => handlePan(30, 0)}
+            title="Pan Left"
+            className="p-1 hover:bg-slate-800 rounded transition text-slate-400 hover:text-white cursor-pointer text-xs flex items-center justify-center w-6 h-6"
+          >
+            ◀
+          </button>
+          <button
+            onClick={handleResetZoom}
+            title="Center Graph"
+            className="p-1 hover:bg-slate-800 rounded transition text-slate-400 hover:text-white cursor-pointer flex items-center justify-center w-6 h-6"
+          >
+            <Crosshair className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={() => handlePan(-30, 0)}
+            title="Pan Right"
+            className="p-1 hover:bg-slate-800 rounded transition text-slate-400 hover:text-white cursor-pointer text-xs flex items-center justify-center w-6 h-6"
+          >
+            ▶
+          </button>
+          <div />
+          <button
+            onClick={() => handlePan(0, -30)}
+            title="Pan Down"
+            className="p-1 hover:bg-slate-800 rounded transition text-slate-400 hover:text-white cursor-pointer text-xs flex items-center justify-center w-6 h-6"
+          >
+            ▼
+          </button>
+          <div />
+        </div>
+        <div className="border-t border-slate-700/80 pt-1 flex flex-col gap-1">
+          <button
+            onClick={handleZoomIn}
+            title="Zoom In"
+            className="p-1 hover:bg-slate-800 rounded transition text-slate-400 hover:text-white cursor-pointer flex justify-center"
+          >
+            <Plus className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={handleZoomOut}
+            title="Zoom Out"
+            className="p-1 hover:bg-slate-800 rounded transition text-slate-400 hover:text-white cursor-pointer flex justify-center"
+          >
+            <Minus className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={handleResetZoom}
+            title="Reset View"
+            className="p-1 hover:bg-slate-800 rounded transition text-slate-400 hover:text-white cursor-pointer flex justify-center"
+          >
+            <Maximize2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
 
       {/* Data Grid Badges (Bottom-Left) */}
       <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur p-2 border border-slate-700 rounded-lg text-[9px] uppercase tracking-tighter z-10 pointer-events-none font-mono">
         <div className="text-white font-semibold">DEPOT: Node 0</div>
         <div className="text-slate-400">NODES: {nodes.length} | EDGES: {edges.length}</div>
+        <div className="text-[#00FF9D] text-[8px] mt-0.5">Drag to pan • Scroll to zoom</div>
       </div>
 
       {/* SVG Interactive Canvas */}
       <svg
         viewBox="0 0 600 420"
-        className="w-full h-full cursor-grab active:cursor-grabbing transition-transform duration-300 ease-out"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        className={`w-full h-full ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} transition-transform duration-100 ease-out`}
         style={{
           transform: `scale(${zoomLevel}) translate(${panOffset.x}px, ${panOffset.y}px)`
         }}
@@ -331,7 +406,7 @@ export const RouteMap: React.FC<RouteMapProps> = ({
                     )}
                     {/* Base Node Circle */}
                     <circle
-                      r={isHovered ? '9' : '7.5'}
+                      r={isHovered ? (isHighDensity ? '7' : '9') : (isHighDensity ? '5' : '7.5')}
                       fill={isAffectedEndpoint ? '#FF3366' : '#1E293B'}
                       stroke={
                         isAffectedEndpoint
@@ -340,25 +415,27 @@ export const RouteMap: React.FC<RouteMapProps> = ({
                           ? '#00FF9D'
                           : '#00A3FF'
                       }
-                      strokeWidth="1.5"
+                      strokeWidth={isHighDensity ? 1.0 : 1.5}
                       className="transition-all duration-150"
                     />
                     {/* Inner dot */}
                     <circle
-                      r="2.5"
+                      r={isHighDensity ? 1.5 : 2.5}
                       fill={isAffectedEndpoint ? '#FFFFFF' : '#00FF9D'}
                     />
                     {/* Node Label */}
-                    <text
-                      y="3"
-                      textAnchor="middle"
-                      fontSize="7.5"
-                      fontWeight="bold"
-                      fill="#FFFFFF"
-                      className="font-mono pointer-events-none select-none"
-                    >
-                      {node.id}
-                    </text>
+                    {(!isHighDensity || isHovered || node.id % 5 === 0) && (
+                      <text
+                        y={isHighDensity ? '2.5' : '3'}
+                        textAnchor="middle"
+                        fontSize={isHighDensity ? '6' : '7.5'}
+                        fontWeight="bold"
+                        fill="#FFFFFF"
+                        className="font-mono pointer-events-none select-none"
+                      >
+                        {node.id}
+                      </text>
+                    )}
                   </>
                 )}
               </g>

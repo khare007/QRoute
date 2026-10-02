@@ -4,6 +4,7 @@ SIH QRoute - Quantum-Inspired Traffic-Aware VRP FastAPI Backend
 ===============================================================
 """
 
+import numpy as np
 from typing import Optional, List
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException

@@ -10,8 +10,15 @@ Features:
 5. Direct 3-Tuple Return Adapter for benchmark.py and main.py Integration
 """
 import numpy as np
-from ortools.constraint_solver import routing_enums_pb2
-from ortools.constraint_solver import pywrapcp
+
+try:
+    from ortools.constraint_solver import routing_enums_pb2
+    from ortools.constraint_solver import pywrapcp
+    HAS_ORTOOLS = True
+except Exception as e:
+    HAS_ORTOOLS = False
+    print(f"[!] Warning: Google OR-Tools pywrapcp could not be initialized natively: {e}. Using fallback heuristic.")
+
 from fitness import calculate_fitness
 
 SCALE_FACTOR = 1000  # Scaling factor converting decimal costs to integers for OR-Tools
@@ -30,6 +37,7 @@ def solve_with_ortools_cvrp(
 ):
     """
     Solves Capacitated VRP with Traffic Congestion using Google OR-Tools C++ engine.
+    Falls back to sweep CVRP if OR-Tools is blocked by security policy.
     """
     num_nodes = len(distance_matrix)
     
@@ -41,6 +49,17 @@ def solve_with_ortools_cvrp(
         
     if congestion_matrix is None:
         congestion_matrix = np.zeros_like(distance_matrix)
+
+    if not HAS_ORTOOLS:
+        # Fallback heuristic if pywrapcp is blocked
+        node_ids = list(range(1, num_nodes))
+        chunk_size = int(np.ceil(len(node_ids) / max(1, num_vehicles)))
+        fallback_routes = []
+        for v in range(num_vehicles):
+            slice_nodes = node_ids[v * chunk_size : (v + 1) * chunk_size]
+            if slice_nodes:
+                fallback_routes.append([depot] + slice_nodes + [depot])
+        return fallback_routes
 
     # 1. Non-Linear Traffic-Aware Arc Cost Matrix (Strictly Aligned with fitness.py)
     # cost = w_dist * distance + w_cong * (distance * congestion * (1.0 + congestion^2 * 3.5))

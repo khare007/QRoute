@@ -378,7 +378,8 @@ export const DELHI_ROAD_NETWORK_EDGES: DelhiRoadEdge[] = [
 
 /**
  * Projects real Delhi GPS coordinates to 2D SVG canvas (600x420)
- * preserving authentic geographic layout (North is Top, West is Left, CP is Central Hub).
+ * using true isotropic 1:1 physical aspect ratio (North is Top, East is Right, Connaught Place is Central Hub).
+ * Guarantees zero distortion or visual tilt across all node counts (N=2 to 101).
  */
 export function getDelhiProjectedGraphNodes(count: number = 25): { id: number; label: string; x: number; y: number; demand: number; isDepot: boolean }[] {
   const total = Math.max(2, Math.min(count, 101));
@@ -387,20 +388,38 @@ export function getDelhiProjectedGraphNodes(count: number = 25): { id: number; l
     coords.push(getNodeDelhiCoords(i));
   }
 
-  let minLat = Math.min(...coords.map((c) => c[0]));
-  let maxLat = Math.max(...coords.map((c) => c[0]));
-  let minLon = Math.min(...coords.map((c) => c[1]));
-  let maxLon = Math.max(...coords.map((c) => c[1]));
+  // Delhi center reference (Connaught Place / Central Delhi)
+  const centerLat = 28.586;
+  const centerLon = 77.215;
+  const cosLat = Math.cos((centerLat * Math.PI) / 180);
 
-  const latSpan = Math.max(0.015, maxLat - minLat);
-  const lonSpan = Math.max(0.015, maxLon - minLon);
+  // Convert each GPS coord into metric offset (km) from center
+  const metricCoords = coords.map(([lat, lon]) => ({
+    xKm: (lon - centerLon) * 111.32 * cosLat,
+    yKm: (lat - centerLat) * 111.0
+  }));
+
+  const minX = Math.min(...metricCoords.map((c) => c.xKm));
+  const maxX = Math.max(...metricCoords.map((c) => c.xKm));
+  const minY = Math.min(...metricCoords.map((c) => c.yKm));
+  const maxY = Math.max(...metricCoords.map((c) => c.yKm));
+
+  const spanX = Math.max(1.8, maxX - minX);
+  const spanY = Math.max(1.8, maxY - minY);
+  const midX = (minX + maxX) / 2;
+  const midY = (minY + maxY) / 2;
+
+  // Usable canvas dimensions inside 600x420 viewBox
+  const usableWidth = 510;
+  const usableHeight = 340;
+  const scale = Math.min(usableWidth / spanX, usableHeight / spanY);
 
   const nodes = [];
   for (let i = 0; i < total; i++) {
-    const [lat, lon] = coords[i];
-    // Project into SVG canvas (viewBox 600 x 420) with 60px padding
-    const x = Math.round(60 + ((lon - minLon) / lonSpan) * 480);
-    const y = Math.round(50 + ((maxLat - lat) / latSpan) * 320);
+    const { xKm, yKm } = metricCoords[i];
+    // Center at (300, 210) with exact 1:1 isotropic scale (North is -Y, East is +X)
+    const x = Math.round(300 + (xKm - midX) * scale);
+    const y = Math.round(210 - (yKm - midY) * scale);
     const demand = i === 0 ? 0 : ((i * 7) % 18 + 8);
     nodes.push({
       id: i,

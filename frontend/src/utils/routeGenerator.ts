@@ -66,9 +66,9 @@ export function generateFleetRoutes(
       const idx1 = path.indexOf(affectedEdge[0]);
       const idx2 = path.indexOf(affectedEdge[1]);
       if (idx1 !== -1 && idx2 !== -1 && Math.abs(idx1 - idx2) === 1) {
-        // Reroute via an alternative waypoint
+        // Reroute via Sikandra Road / Ferozeshah Road bypass (Node 18 or 17)
         const insertIdx = Math.max(idx1, idx2);
-        path.splice(insertIdx, 0, 11);
+        path.splice(insertIdx, 0, 18);
       }
     }
 
@@ -82,7 +82,7 @@ export function generateFleetRoutes(
       }
     }
 
-    const time = Number((distance * 1.85 + (isReoptimized ? 4.5 : 0)).toFixed(1));
+    const time = Number((distance * 1.85 + (isReoptimized ? 2.5 : 0)).toFixed(1));
 
     vehicles.push({
       vehicleId: i + 1,

@@ -40,8 +40,27 @@ interface DelhiOsmMapProps {
 const MapController: React.FC<{
   coords: [number, number][];
   zoomAction: { type: 'in' | 'out' | 'reset'; ts: number } | null;
-}> = ({ coords, zoomAction }) => {
+  mapTileStyle?: string;
+}> = ({ coords, zoomAction, mapTileStyle }) => {
   const map = useMap();
+
+  // Invalidate size on mount, style switch, and container resize so tiles cover 100% of the canvas
+  useEffect(() => {
+    const handleResize = () => {
+      map.invalidateSize();
+    };
+    handleResize();
+    const t1 = setTimeout(handleResize, 100);
+    const t2 = setTimeout(handleResize, 350);
+    const t3 = setTimeout(handleResize, 700);
+    window.addEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [map, mapTileStyle]);
 
   // Fit bounds on coords change
   useEffect(() => {
@@ -49,6 +68,7 @@ const MapController: React.FC<{
     try {
       const bounds = L.latLngBounds(coords.map((c) => L.latLng(c[0], c[1])));
       map.fitBounds(bounds, { padding: [45, 45], maxZoom: 14, animate: true });
+      map.invalidateSize();
     } catch {
       // Fallback
     }
@@ -509,12 +529,17 @@ export const DelhiOsmMap: React.FC<DelhiOsmMapProps> = ({
           zoom={12}
           zoomControl={false}
           scrollWheelZoom={true}
-          style={{ width: '100%', height: '100%', backgroundColor: '#0B0F19' }}
-          className="z-0"
+          style={{ width: '100%', height: '100%', minHeight: '380px', backgroundColor: '#0B0F19' }}
+          className="z-0 w-full h-full"
         >
-          <TileLayer attribution={tileAttribution} url={tileUrl} />
+          <TileLayer
+            key={mapTileStyle}
+            attribution={tileAttribution}
+            url={tileUrl}
+            maxZoom={19}
+          />
 
-          <MapController coords={allCoords} zoomAction={zoomTrigger} />
+          <MapController coords={allCoords} zoomAction={zoomTrigger} mapTileStyle={mapTileStyle} />
 
           {/* LAYER 1: Optional Delhi Arterial Road Corridors Grid */}
           {showRoadNetwork &&
