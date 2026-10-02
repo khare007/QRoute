@@ -116,6 +116,3 @@ npm run dev
 
 ---
 
-## 👥 Authors & Team
-Developed for **Smart India Hackathon (SIH)**.
-Licensed under the **MIT License**.
