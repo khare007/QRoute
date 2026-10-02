@@ -9,12 +9,6 @@
 
 ---
 
-## 🌐 Live Cloud Demo
-* **Frontend Web Dashboard:** [https://quantum-vpr-frontend-496528007942.us-central1.run.app](https://quantum-vpr-frontend-496528007942.us-central1.run.app)
-* **Backend API Docs (FastAPI Swagger):** [https://quantum-vpr-backend-496528007942.us-central1.run.app/docs](https://quantum-vpr-backend-496528007942.us-central1.run.app/docs)
-
----
-
 ## 📌 What is QRoute? (In Plain English)
 
 Imagine managing a fleet of delivery vehicles in a congested mega-city like **Delhi NCR**. 
