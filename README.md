@@ -1,14 +1,4 @@
 # 🚚⚡ QRoute: Quantum-Inspired Traffic-Aware Fleet Routing Engine
-
-> **Smart, Quantum-Powered Vehicle Routing for Modern Cities — Powered by QPSO, Real OpenStreetMap (OSM) Networks & Live Traffic Rerouting.**
-
-[![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20%7C%20Python%203.11-009688.svg?style=flat&logo=fastapi)](https://fastapi.tiangolo.com)
-[![React](https://img.shields.io/badge/Frontend-React%20%7C%20TypeScript%20%7C%20Vite-61DAFB.svg?style=flat&logo=react)](https://react.dev)
-[![Google Cloud Run](https://img.shields.io/badge/Deployment-Google%20Cloud%20Run-4285F4.svg?style=flat&logo=googlecloud)](https://cloud.google.com/run)
-[![OSM](https://img.shields.io/badge/Maps-OpenStreetMap%20%7C%20Leaflet-7EBC6F.svg?style=flat&logo=openstreetmap)](https://www.openstreetmap.org)
-
----
-
 ## 📌 What is QRoute?
 
 Imagine managing a fleet of delivery vehicles in a congested mega-city like **Delhi NCR**. 
